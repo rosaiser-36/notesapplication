@@ -19,7 +19,7 @@ pipeline {
         stage('pushing the image to docker hub') {
             steps {
                 echo 'Authenticating Docker hub'
-                withCredentials([usernameColonPassword(credentialsId: 'DockerHub', passwordvariable: 'dockerHubpass', usernameVariable: 'dockerHubuser')]) {
+                withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordvariable: 'dockerHubpass', usernameVariable: 'dockerHubuser')]) {
                 sh "docker tag jenkinsappimage ${env.dockerHubuser}/jenkinsappimage:latest"
                 sh "docker login -u {$env.dockerHubuser} -p {$env.dockerHubuser"} // some block
                 sh "docker push ${env.dockerHubuser}/jenkinsappimage:latest"
