@@ -3,22 +3,35 @@ pipeline {
 
     stages {
 
-        stage('clone and build'){
+        stage('Clone the source code'){
             steps {
                 echo 'cloning'
                 git url: 'https://github.com/rosaiser-36/notesapplication.git' , branch: 'main'
-                sh 'docker build -t jenkinsappimage .'             
-            }
-     
-        stage('Test') {
-            steps {
-                echo 'Testing..'
+                            
             }
         }
+         stage('Building the images') {
+            steps {
+                echo 'Building docker image'
+                sh 'docker build -t jenkinsappimage .'
+            }
+        }
+        stage('pushing the image to docker hub') {
+            steps {
+                echo 'Authenticating Docker hub'
+                withCredentials([usernameColonPassword(credentialsId: 'DockerHub', passwordvariable: 'dockerHubpass', usernameVariable: 'dockerHubuser')]) {
+                sh "docker tag jenkinsappimage ${env.dockerHubuser}/jenkinsappimage:latest"
+                sh "docker login -u {$env.dockerHubuser} -p {$env.dockerHubuser"} // some block
+                sh "docker push ${env.dockerHubuser}/jenkinsappimage:latest"
+            }
+        }
+        
         stage('Deploy') {
             steps {
-                echo 'Deploying....'
+                echo 'Deploying with docker compose'
+                sh 'docker-compose down && docker-compose up -d'
             }
         }
     }
 }
+
